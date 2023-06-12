@@ -4,17 +4,16 @@ using Test_Turtle_Game;
 using System.IO;
 using System;
 using Test_Turtle_Game.Interface;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Test_Turtle_Game.Commands;
 
 namespace Unit_Test_Turtle
 {
-    public class TurtleTests
+    public class Test_Move_Turtle
     {
         private Turtle _turtle;
         private IPositionValidator _positionValidator;
 
-        public TurtleTests()
+        public Test_Move_Turtle()
         {
             _positionValidator = new GridPositionValidator(5, 5);
             _turtle = new Turtle(_positionValidator);
