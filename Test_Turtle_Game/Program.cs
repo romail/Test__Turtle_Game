@@ -9,7 +9,7 @@ namespace Test_Turtle_Game
     {
         static void Main(string[] args)
         {
-            IPositionValidator positionValidator = new GridPositionValidator(5, 5);
+            IPositionValidator positionValidator = new Tabletop(5, 5);
             Turtle turtle = new Turtle(positionValidator);
             CommandInvoker invoker = new CommandInvoker();
             StreamReader reader = null;

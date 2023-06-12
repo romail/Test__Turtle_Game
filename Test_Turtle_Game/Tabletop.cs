@@ -2,12 +2,12 @@
 
 namespace Test_Turtle_Game
 {
-    public class GridPositionValidator : IPositionValidator
+    public class Tabletop : IPositionValidator
     {
         private readonly int maxX;
         private readonly int maxY;
 
-        public GridPositionValidator(int maxX, int maxY)
+        public Tabletop(int maxX, int maxY)
         {
             this.maxX = maxX;
             this.maxY = maxY;

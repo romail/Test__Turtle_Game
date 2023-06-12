@@ -15,14 +15,14 @@ namespace Unit_Test_Turtle
 
         public Test_Move_Turtle()
         {
-            _positionValidator = new GridPositionValidator(5, 5);
+            _positionValidator = new Tabletop(5, 5);
             _turtle = new Turtle(_positionValidator);
         }
 
         [Fact]
         public void TestTurtleInitialState()
         {
-            IPositionValidator positionValidator = new GridPositionValidator(5, 5);
+            IPositionValidator positionValidator = new Tabletop(5, 5);
             var turtle = new Turtle(positionValidator);
 
             Assert.False(turtle.IsPlaced);
@@ -54,7 +54,7 @@ namespace Unit_Test_Turtle
         [Fact]
         public void TestTurtlePlacement()
         {
-            IPositionValidator positionValidator = new GridPositionValidator(5, 5);
+            IPositionValidator positionValidator = new Tabletop(5, 5);
             var turtle = new Turtle(positionValidator);
 
             turtle.Place(0, 0, Direction.NORTH);
@@ -124,7 +124,7 @@ namespace Unit_Test_Turtle
         [Fact]
         public void TestReadCommandsFromFile()
         {
-            IPositionValidator positionValidator = new GridPositionValidator(5, 5);
+            IPositionValidator positionValidator = new Tabletop(5, 5);
             var turtle = new Turtle(positionValidator);
             var invoker = new CommandInvoker();
 
