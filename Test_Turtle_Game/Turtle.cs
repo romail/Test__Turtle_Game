@@ -1,4 +1,5 @@
 ﻿using System;
+using Test_Turtle_Game.Interface;
 
 namespace Test_Turtle_Game
 {
@@ -16,15 +17,19 @@ namespace Test_Turtle_Game
         private int _y;
         private Direction _direction;
         private bool _isPlaced;
+        private readonly IPositionValidator _positionValidator;
 
-        public Turtle()
+        public bool IsPlaced { get => _isPlaced; }
+
+        public Turtle(IPositionValidator positionValidator)
         {
             _isPlaced = false;
+            _positionValidator = positionValidator;
         }
 
         public void Place(int x, int y, Direction direction)
         {
-            if (IsValidPosition(x, y))
+            if (_positionValidator.IsValidPosition(x, y))
             {
                 _x = x;
                 _y = y;
@@ -57,7 +62,7 @@ namespace Test_Turtle_Game
                     break;
             }
 
-            if (IsValidPosition(newX, newY))
+            if (_positionValidator.IsValidPosition(newX, newY))
             {
                 _x = newX;
                 _y = newY;
@@ -80,22 +85,21 @@ namespace Test_Turtle_Game
             _direction = (Direction)(((int)_direction + 1) % 4);
         }
 
-        public string Report()
+        public void Report()
         {
-            if (!_isPlaced)
-                return null;
-
-            string result = $"{_x},{_y},{_direction}";
-
-            Console.WriteLine(result);
-
-            return result;
+            Console.WriteLine(ToString());
         }
 
-        private bool IsValidPosition(int x, int y)
+        public override string ToString()
         {
-            return x >= 0 && x <= 5 && y >= 0 && y <= 5;
+            return $"{_x},{_y},{_direction}";
+        }
+
+       
+
+        public (int X, int Y, Direction Direction) GetCurrentPosition()
+        {
+            return (_x, _y, _direction);
         }
     }
-
 }

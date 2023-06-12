@@ -1,50 +1,79 @@
 using Xunit;
 using FluentAssertions;
 using Test_Turtle_Game;
+using System.IO;
+using System;
+using Test_Turtle_Game.Interface;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Test_Turtle_Game.Commands;
 
 namespace Unit_Test_Turtle
 {
     public class TurtleTests
     {
+        private Turtle _turtle;
+        private IPositionValidator _positionValidator;
+
+        public TurtleTests()
+        {
+            _positionValidator = new GridPositionValidator(5, 5);
+            _turtle = new Turtle(_positionValidator);
+        }
+
+        [Fact]
+        public void TestTurtleInitialState()
+        {
+            IPositionValidator positionValidator = new GridPositionValidator(5, 5);
+            var turtle = new Turtle(positionValidator);
+
+            Assert.False(turtle.IsPlaced);
+        }
+
         [Fact]
         public void Place_Should_Set_X_Y_Direction()
         {
-            // Arrange
-            var turtle = new Turtle();
-
             // Act
-            turtle.Place(1, 2, Direction.NORTH);
+            _turtle.Place(1, 2, Direction.NORTH);
 
             // Assert
-            turtle.Report().Should().Be("1,2,NORTH");
+            _turtle.ToString().Should().Be("1,2,NORTH");
         }
 
         [Fact]
         public void Move_North_Increments_Y()
         {
             // Arrange
-            var turtle = new Turtle();
-            turtle.Place(1, 2, Direction.NORTH);
+            _turtle.Place(1, 2, Direction.NORTH);
 
             // Act
-            turtle.Move();
+            _turtle.Move();
 
             // Assert
-            turtle.Report().Should().Be("1,3,NORTH");
+            _turtle.ToString().Should().Be("1,3,NORTH");
+        }
+
+        [Fact]
+        public void TestTurtlePlacement()
+        {
+            IPositionValidator positionValidator = new GridPositionValidator(5, 5);
+            var turtle = new Turtle(positionValidator);
+
+            turtle.Place(0, 0, Direction.NORTH);
+
+            Assert.True(turtle.IsPlaced);
         }
 
         [Fact]
         public void Left_From_North_Should_Face_West()
         {
             // Arrange
-            var turtle = new Turtle();
-            turtle.Place(1, 2, Direction.NORTH);
+            _turtle.Place(1, 2, Direction.NORTH);
 
             // Act
-            turtle.TurnLeft();
+            _turtle.TurnLeft();
 
             // Assert
-            turtle.Report().Should().Be("1,2,WEST");
+            _turtle.ToString().Should().Be("1,2,WEST");
         }
 
 
@@ -52,28 +81,64 @@ namespace Unit_Test_Turtle
         public void Right_From_North_Should_Face_East()
         {
             // Arrange
-            var turtle = new Turtle();
-            turtle.Place(1, 2, Direction.NORTH);
+            _turtle.Place(1, 2, Direction.NORTH);
 
             // Act
-            turtle.TurnRight();
+            _turtle.TurnRight();
 
             // Assert
-            turtle.Report().Should().Be("1,2,EAST");
+            _turtle.ToString().Should().Be("1,2,EAST");
         }
 
         [Fact]
         public void Turtle_Should_Not_Fall_Off_The_Table()
         {
             // Arrange
-            var turtle = new Turtle();
-            turtle.Place(0, 0, Direction.SOUTH);
+            _turtle.Place(0, 0, Direction.SOUTH);
 
             // Act
-            turtle.Move();
+            _turtle.Move();
 
             // Assert
-            turtle.Report().Should().Be("0,0,SOUTH");
+            _turtle.ToString().Should().Be("0,0,SOUTH");
+        }
+
+
+        [Fact]
+        public void Report_Output_Should_Be_Equal_String()
+        {
+            // Arrange
+            _turtle.Place(0, 0, Direction.SOUTH);
+            var stringWriter = new StringWriter();
+            Console.SetOut(stringWriter);
+
+            // Act
+            _turtle.Move();
+            _turtle.Report();
+
+
+            // Assert
+            var output = stringWriter.ToString();
+            output.Should().Be("0,0,SOUTH\r\n");
+        }
+
+        [Fact]
+        public void TestReadCommandsFromFile()
+        {
+            IPositionValidator positionValidator = new GridPositionValidator(5, 5);
+            var turtle = new Turtle(positionValidator);
+            var invoker = new CommandInvoker();
+
+            using (var reader = new StreamReader("commands.txt"))
+            {
+                CommandsHelper.ReadAndExecuteCommands(reader, invoker, turtle);
+            }
+
+            var position = turtle.GetCurrentPosition();
+
+            Assert.Equal(2, position.X);
+            Assert.Equal(2, position.Y);  // The turtle should have moved EAST
+            Assert.Equal(Direction.EAST, position.Direction);
         }
 
     }

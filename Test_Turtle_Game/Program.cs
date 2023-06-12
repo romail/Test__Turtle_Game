@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using Test_Turtle_Game.Commands;
+using Test_Turtle_Game.Interface;
 
 namespace Test_Turtle_Game
 {
@@ -8,39 +9,58 @@ namespace Test_Turtle_Game
     {
         static void Main(string[] args)
         {
-            Turtle turtle = new Turtle();
+            IPositionValidator positionValidator = new GridPositionValidator(5, 5);
+            Turtle turtle = new Turtle(positionValidator);
+            CommandInvoker invoker = new CommandInvoker();
+            StreamReader reader = null;
 
-            var strategies = new Dictionary<string, Action<string>>
+            Console.WriteLine("Welcome to the Turtle Simulator!");
+            Console.WriteLine("Commands:");
+            Console.WriteLine("PLACE,X,Y,DIRECTION: Place the turtle at a specific position facing a specific direction. E.g., PLACE,1,1,NORTH.");
+            Console.WriteLine("MOVE: Move the turtle forward in the direction it's facing.");
+            Console.WriteLine("LEFT: Turn the turtle to its left.");
+            Console.WriteLine("RIGHT: Turn the turtle to its right.");
+            Console.WriteLine("REPORT: Report the current position and direction of the turtle.\n");
+
+            if (args.Length > 0)
             {
+                string path = Path.GetFullPath(args[0]);
+                
+                if (File.Exists(path))
                 {
-                    "PLACE", (commandLine) =>
+                    try
                     {
-                        var parts = commandLine.Split(' ', ',');
-                        if (parts.Length == 4 && Enum.TryParse(parts[3], out Direction direction) &&
-                            int.TryParse(parts[1], out int x) && int.TryParse(parts[2], out int y))
-                        {
-                            new PlaceCommand(turtle, x, y, direction).Execute();
-                        }
+                        reader = new StreamReader(path);
+                        Console.WriteLine($"Reading commands from file: {path}\n");
                     }
-                },
-                { "MOVE", (commandLine) => new MoveCommand(turtle).Execute() },
-                { "LEFT", (commandLine) => new LeftCommand(turtle).Execute() },
-                { "RIGHT", (commandLine) => new RightCommand(turtle).Execute() },
-                { "REPORT", (commandLine) => new ReportCommand(turtle).Execute() },
-            };
-
-            Console.WriteLine("Enter command:");
-
-            string command;
-            while ((command = Console.ReadLine()) != null)
-            {
-                var parts = command.Split(' ', ',');
-                if (strategies.ContainsKey(parts[0]))
-                {
-                    strategies[parts[0]].Invoke(command);
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Error opening file: {e.Message}\n");
+                        Console.WriteLine("Falling back to standard input...\n");
+                        reader = new StreamReader(Console.OpenStandardInput());
+                    }
                 }
             }
-        }
-    }
+            else
+            {
+                Console.WriteLine("Please enter commands:\n");
+                reader = new StreamReader(Console.OpenStandardInput());
+            }
 
+            try
+            {
+                CommandsHelper.ReadAndExecuteCommands(reader, invoker, turtle);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error reading commands: {e.Message}\n");
+            }
+            finally
+            {
+                reader.Close();
+            }
+        }
+
+      
+    }
 }

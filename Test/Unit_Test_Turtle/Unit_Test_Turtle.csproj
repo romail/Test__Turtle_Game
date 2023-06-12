@@ -24,4 +24,10 @@
     <ProjectReference Include="..\..\Test_Turtle_Game\Test_Turtle_Game.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="commands.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
